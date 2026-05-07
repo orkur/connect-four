@@ -1,22 +1,28 @@
 plugins {
-    kotlin("jvm") version "2.3.20"
-}
-
-group = "org.example"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation(kotlin("test"))
+    kotlin("multiplatform") version "2.1.20"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.20"
+    id("org.jetbrains.compose") version "1.7.3"
 }
 
 kotlin {
-    jvmToolchain(21)
-}
+    js(IR) {
+        browser {
+            binaries.executable()
+        }
+    }
 
-tasks.test {
-    useJUnitPlatform()
+    sourceSets {
+        val jsMain by getting {
+            dependencies {
+                implementation("org.jetbrains.compose.runtime:runtime:1.7.3")
+                implementation("org.jetbrains.compose.html:html-core:1.7.3")
+            }
+        }
+
+        val jsTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+    }
 }
