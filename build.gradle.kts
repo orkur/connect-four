@@ -8,6 +8,12 @@ kotlin {
     js(IR) {
         browser {
             binaries.executable()
+
+            testTask {
+                useKarma {
+                    useChromeHeadless()
+                }
+            }
         }
     }
 
