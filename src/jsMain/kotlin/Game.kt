@@ -1,5 +1,8 @@
 package org.example
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Player {
     Red,
     Yellow;
@@ -7,6 +10,7 @@ enum class Player {
     fun next(): Player = if (this == Red) Yellow else Red
 }
 
+@Serializable
 data class GameConfig (
     val rows: Int = 6,
     val columns: Int = 7,
@@ -21,6 +25,8 @@ data class GameConfig (
         require(winLength <= maxOf(rows, columns)) { "Win length must be <= maxOf(rows, columns)" }
     }
 }
+
+@Serializable
 enum class GameStatus {
     InProgress,
     YellowWin,
@@ -33,6 +39,7 @@ enum class GameStatus {
     }
 }
 
+@Serializable
 data class GameState(
     val config: GameConfig = GameConfig(),
     val board: List<List<Player?>> = List(config.rows) { List(config.columns) { null } },

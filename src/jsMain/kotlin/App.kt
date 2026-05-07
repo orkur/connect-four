@@ -18,7 +18,8 @@ private fun GameControls(
     onColumnsChange: (String) -> Unit,
     onWinLengthChange: (String) -> Unit,
     onNewGame: () -> Unit,
-    onResetGame: () -> Unit
+    onResetGame: () -> Unit,
+    onClearSavedGame: () -> Unit,
 ){
     Div({ classes(AppStyles.controls)}) {
         Label {
@@ -63,6 +64,13 @@ private fun GameControls(
         }) {
             Text("Reset")
         }
+        Button(attrs = {
+            onClick {
+                onClearSavedGame()
+            }
+        }) {
+            Text("Clear saved game")
+        }
     }
 
     if (errorMessage != null) {
@@ -77,7 +85,7 @@ private fun GameControls(
 fun App() {
     Style(AppStyles)
 
-    var game by remember { mutableStateOf(GameState()) }
+    var game by remember { mutableStateOf(loadGameState() ?: GameState()) }
 
     var rowsInput by remember { mutableStateOf(game.config.rows.toString()) }
     var columnsInput by remember { mutableStateOf(game.config.columns.toString()) }
@@ -99,6 +107,7 @@ fun App() {
                     val config = GameConfig(rows, columns, winLength)
 
                     game = GameState(config)
+                    saveGameState(game)
                     errorMessage = null
                 } catch (e: Exception) {
                     errorMessage = e.message ?: "Invalid configuration"
@@ -108,6 +117,17 @@ fun App() {
                 game = GameState(config = game.config)
                 errorMessage = null
 
+            },
+            onClearSavedGame = {
+                clearSavedGameState()
+
+                game = GameState()
+
+                rowsInput = game.config.rows.toString()
+                columnsInput = game.config.columns.toString()
+                winLengthInput = game.config.winLength.toString()
+
+                errorMessage = null
             }
         )
         P({ classes(AppStyles.status) }) {
@@ -117,6 +137,7 @@ fun App() {
         Board(game = game,
         onColumnClick = { column ->
             game = game.dropPiece(column)
+            saveGameState(game)
         })
     }
 }
