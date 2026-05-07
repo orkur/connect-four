@@ -12,6 +12,9 @@ fun App() {
         H1 {
             Text("Connect Four")
         }
+        P({ classes(AppStyles.status) }) {
+            Text(statusText(game))
+        }
 
         Board(game = game,
         onColumnClick = { column ->
@@ -20,6 +23,13 @@ fun App() {
     }
 }
 
+private fun statusText(game: GameState): String =
+    when (game.gameStatus) {
+        GameStatus.InProgress -> "Current player: ${game.activePlayer}"
+        GameStatus.RedWin -> "Red wins!"
+        GameStatus.YellowWin -> "Yellow wins!"
+        GameStatus.Draw -> "Draw!"
+    }
 @Composable
 private fun Board(
     game: GameState,
@@ -35,7 +45,7 @@ private fun Board(
             row.forEachIndexed { columnIndex, cell ->
                 Div({
                     classes(AppStyles.slot)
-                    onClick { onColumnClick(columnIndex) }
+                    onClick { if (game.gameStatus == GameStatus.InProgress) onColumnClick(columnIndex) }
                 }) {
                     Div({ classes(
                         when (cell) {
@@ -106,6 +116,12 @@ object AppStyles : StyleSheet() {
         height(85.percent)
         borderRadius(50.percent)
         backgroundColor(Color.yellow)
+    }
+
+    val status by style {
+        fontSize(20.px)
+        fontWeight("600")
+        marginBottom(16.px)
     }
 
 
