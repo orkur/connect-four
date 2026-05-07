@@ -44,7 +44,7 @@ data class GameState(
 fun GameState.dropPiece(column: Int): GameState {
     if (column < 0 || column >= config.columns) error("Column must be in [0, ${board.size-1}]")
 
-    if (gameStatus == GameStatus.Draw) return this
+    if (gameStatus != GameStatus.InProgress) return this
 
     val rowNumber = (config.rows - 1 downTo 0).firstOrNull { row -> board[row][column] == null } ?: return this
 
