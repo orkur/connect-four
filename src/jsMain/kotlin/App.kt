@@ -7,19 +7,23 @@ import org.jetbrains.compose.web.dom.*
 @Composable
 fun App() {
     Style(AppStyles)
-
+    var game by remember { mutableStateOf(GameState()) }
     Div({ classes(AppStyles.page) }) {
         H1 {
             Text("Connect Four")
         }
 
-        Board(GameState())
+        Board(game = game,
+        onColumnClick = { column ->
+            game = game.dropPiece(column)
+        })
     }
 }
 
 @Composable
 private fun Board(
-    game: GameState
+    game: GameState,
+    onColumnClick: (Int) -> Unit
 ) {
     Div({
         classes(AppStyles.board)
@@ -28,8 +32,11 @@ private fun Board(
         }
     }) {
         game.board.forEach { row ->
-            row.forEach { cell ->
-                Div({ classes(AppStyles.slot) }) {
+            row.forEachIndexed { columnIndex, cell ->
+                Div({
+                    classes(AppStyles.slot)
+                    onClick { onColumnClick(columnIndex) }
+                }) {
                     Div({ classes(
                         when (cell) {
                             Player.Red -> AppStyles.redPiece
@@ -76,6 +83,8 @@ object AppStyles : StyleSheet() {
         display(DisplayStyle.Flex)
         alignItems(AlignItems.Center)
         justifyContent(JustifyContent.Center)
+
+        property("cursor", "pointer")
     }
 
     val emptyPiece by style {
