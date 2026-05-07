@@ -94,7 +94,7 @@ fun App() {
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Div({ classes(AppStyles.page) }) {
-        H1 {
+        H1 ({ classes(AppStyles.title) }) {
             Text("Connect Four")
         }
         GameControls(rowsInput,columnsInput,winLengthInput,errorMessage, onRowsChange = { rowsInput = it },
@@ -226,11 +226,14 @@ private fun Board(
 object AppStyles : StyleSheet() {
     val page by style {
         minHeight(100.vh)
-        padding(24.px)
         boxSizing("border-box")
         fontFamily("system-ui", "Arial", "sans-serif")
         textAlign("center")
         backgroundColor(rgb(245, 247, 250))
+        display(DisplayStyle.Flex)
+        flexDirection(FlexDirection.Column)
+        justifyContent(JustifyContent.Center)
+        alignItems(AlignItems.Center)
     }
 
     val board by style {
@@ -297,37 +300,45 @@ object AppStyles : StyleSheet() {
         property("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)")
     }
 
+    val title by style {
+        fontSize(36.px)
+        fontWeight("800")
+        marginBottom(20.px)
+    }
+
     val status by style {
-        fontSize(20.px)
-        fontWeight("600")
-        marginBottom(16.px)
+        fontSize(22.px)
+        fontWeight("700")
+        marginBottom(18.px)
     }
 
     val controls by style {
         display(DisplayStyle.Flex)
-        gap(12.px)
+        gap(14.px)
         flexWrap(FlexWrap.Wrap)
         justifyContent(JustifyContent.Center)
         alignItems(AlignItems.End)
-        marginBottom(16.px)
+        marginBottom(18.px)
 
         self + " label" style {
             display(DisplayStyle.Flex)
             flexDirection(FlexDirection.Column)
-            gap(4.px)
+            gap(6.px)
             textAlign("left")
-            fontSize(14.px)
+            fontSize(16.px)
+            fontWeight("600")
         }
 
         self + " input" style {
-            width(80.px)
-            padding(6.px)
-            fontSize(16.px)
+            width(92.px)
+            padding(8.px)
+            fontSize(18.px)
         }
 
         self + " button" style {
-            padding(8.px, 14.px)
-            fontSize(16.px)
+            padding(16.px, 12.px)
+            fontSize(18.px)
+            fontWeight("600")
             property("cursor", "pointer")
         }
     }
