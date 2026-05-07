@@ -13,24 +13,31 @@ fun App() {
             Text("Connect Four")
         }
 
-        EmptyBoard(rows = 6, columns = 7)
+        Board(GameState())
     }
 }
 
 @Composable
-private fun EmptyBoard(
-    rows: Int,
-    columns: Int
+private fun Board(
+    game: GameState
 ) {
     Div({
         classes(AppStyles.board)
         style {
-            property("grid-template-columns", "repeat($columns, 1fr)")
+            property("grid-template-columns", "repeat(${game.config.columns}, 1fr)")
         }
     }) {
-        repeat(rows * columns) {
-            Div({ classes(AppStyles.slot) }) {
-                Div({ classes(AppStyles.emptyPiece) })
+        game.board.forEach { row ->
+            row.forEach { cell ->
+                Div({ classes(AppStyles.slot) }) {
+                    Div({ classes(
+                        when (cell) {
+                            Player.Red -> AppStyles.redPiece
+                            Player.Yellow -> AppStyles.yellowPiece
+                            null -> AppStyles.emptyPiece
+                        }
+                    ) })
+                }
             }
         }
     }
@@ -77,4 +84,20 @@ object AppStyles : StyleSheet() {
         borderRadius(50.percent)
         backgroundColor(Color.white)
     }
+
+    val redPiece by style {
+        width(85.percent)
+        height(85.percent)
+        borderRadius(50.percent)
+        backgroundColor(Color.red)
+    }
+
+    val yellowPiece by style {
+        width(85.percent)
+        height(85.percent)
+        borderRadius(50.percent)
+        backgroundColor(Color.yellow)
+    }
+
+
 }
