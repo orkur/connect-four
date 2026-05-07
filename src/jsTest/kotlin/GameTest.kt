@@ -2,11 +2,13 @@ import org.example.GameConfig
 import org.example.GameState
 import org.example.GameStatus
 import org.example.Player
+import org.example.Position
 import org.example.dropPiece
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class GameTest {
     @Test
@@ -48,6 +50,11 @@ class GameTest {
         game = game.dropPiece(0)
 
         assertEquals(GameStatus.RedWin, game.gameStatus)
+        assertTrue { Position(5,0) in game.winResult!! }
+        assertTrue { Position(4,0) in game.winResult!! }
+        assertTrue { Position(3,0) in game.winResult!! }
+        assertTrue { Position(2,0) in game.winResult!! }
+
         val gameAfterExtraMove = game.dropPiece(1)
 
         assertEquals(game, gameAfterExtraMove)

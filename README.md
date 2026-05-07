@@ -6,7 +6,7 @@ A web-based configurable Connect Four built with Kotlin/JS and Compose HTML
 
 - Configurable board size and win condition
 - Local two player gameplay
-- Win and draw detection
+- Highlights the winning line
 - Basic piece drop animation
 - Local storage persistence
 - Unit tests

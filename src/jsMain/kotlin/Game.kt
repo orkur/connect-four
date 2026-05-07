@@ -51,7 +51,8 @@ data class GameState(
     val activePlayer: Player = Player.Red,
     val gameStatus: GameStatus = GameStatus.InProgress,
     val freeSpaces: Int = config.rows * config.columns,
-    val lastMove: Position? = null
+    val lastMove: Position? = null,
+    val winResult: Set<Position>? = null
 )
 
 fun GameState.dropPiece(column: Int): GameState {
@@ -71,7 +72,8 @@ fun GameState.dropPiece(column: Int): GameState {
     }
     val newFreeSpaces = freeSpaces - 1
     var newGameStatus : GameStatus = GameStatus.InProgress
-    if (isWin(newBoard, column, rowNumber, activePlayer, config.winLength)) {
+    val set = winSet(newBoard, column, rowNumber, activePlayer, config.winLength)
+    if (set != null) {
         newGameStatus = GameStatus.setWinner(activePlayer)
     } else if (newFreeSpaces == 0){
         newGameStatus = GameStatus.Draw
@@ -82,32 +84,33 @@ fun GameState.dropPiece(column: Int): GameState {
          activePlayer = if (newGameStatus == GameStatus.InProgress) activePlayer.next() else activePlayer,
          gameStatus = newGameStatus,
          freeSpaces = newFreeSpaces,
-         lastMove = Position(rowNumber, column)
+         lastMove = Position(rowNumber, column),
+         winResult = set
      )
 }
 
-private fun isWin(board: List<List<Player?>>, column: Int, row: Int, activePlayer: Player, winLength: Int): Boolean {
+private fun winSet(board: List<List<Player?>>, column: Int, row: Int, activePlayer: Player, winLength: Int): Set<Position>? {
     val directions = listOf(Pair(0,1), Pair(1,0), Pair(1,-1), Pair(1, 1))
     for ((x, y) in directions) {
-        var count = 1
-        count += countOneDirection(board, column, row, x, y, activePlayer)
-        count += countOneDirection(board, column, row, -x, -y, activePlayer)
-        if (count >= winLength) {return true}
+        val positions = mutableSetOf(Position(row, column))
+        positions +=  countOneDirection(board, column, row, x, y, activePlayer)
+        positions += countOneDirection(board, column, row, -x, -y, activePlayer)
+        if (positions.size >= winLength) {return positions}
     }
-    return false
+    return null
 
 }
 
 private fun countOneDirection(board: List<List<Player?>>, column: Int, row: Int,
-                              x : Int, y : Int, activePlayer: Player): Int {
+                              x : Int, y : Int, activePlayer: Player): Set<Position> {
     var i = row + x
     var j = column + y
     val maxColumns = board[0].size
     val maxRows = board.size
-    var count = 0
+    val positions = mutableSetOf<Position>()
     while ( i >= 0 && j >= 0 && i < maxRows && j < maxColumns && board[i][j] == activePlayer) {
-        count++
+        positions += (Position(i, j))
         i += x; j += y
     }
-    return count
+    return positions
 }

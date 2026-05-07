@@ -176,14 +176,16 @@ private fun Board(
         }) {
             game.board.forEachIndexed { rowIndex, row ->
                 row.forEachIndexed { columnIndex, cell ->
-                    val isLastMove = game.lastMove == Position(rowIndex, columnIndex)
+                    val pos = Position(rowIndex, columnIndex)
+                    val isLastMove = game.lastMove == pos
+                    val isWinningPiece = game.winResult != null && pos in game.winResult
 
                     Div({ classes(AppStyles.pieceCell) }) {
                         if (cell != null) {
                             Div({ classes(
                                     when (cell) {
-                                        Player.Red -> AppStyles.redPiece
-                                        Player.Yellow -> AppStyles.yellowPiece
+                                        Player.Red -> if(isWinningPiece) AppStyles.redWinningPiece else AppStyles.redPiece
+                                        Player.Yellow -> if(isWinningPiece) AppStyles.yellowWinningPiece else AppStyles.yellowPiece
                                     }
                                 )
                                 if (isLastMove) {
@@ -298,6 +300,22 @@ object AppStyles : StyleSheet() {
         borderRadius(50.percent)
         backgroundColor(Color.yellow)
         property("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)")
+    }
+
+    val redWinningPiece by style {
+        width(82.percent)
+        height(82.percent)
+        borderRadius(50.percent)
+        backgroundColor(Color.darkred)
+        property("box-shadow", "0 0 12px rgba(255, 80, 80, 0.9)")
+    }
+
+    val yellowWinningPiece by style {
+        width(82.percent)
+        height(82.percent)
+        borderRadius(50.percent)
+        backgroundColor(Color.greenyellow)
+        property("box-shadow", "0 0 12px rgba(255, 220, 60, 0.9)")
     }
 
     val title by style {
