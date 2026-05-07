@@ -54,6 +54,22 @@ class GameTest {
     }
 
     @Test
+    fun detectDraw() {
+        var game = GameState(config = GameConfig(2, 3, 3))
+        game = game.dropPiece(0)
+        game = game.dropPiece(1)
+        game = game.dropPiece(2)
+        game = game.dropPiece(0)
+        game = game.dropPiece(1)
+        game = game.dropPiece(2)
+
+        assertEquals(GameStatus.Draw, game.gameStatus)
+        val gameAfterExtraMove = game.dropPiece(1)
+
+        assertEquals(game, gameAfterExtraMove)
+    }
+
+    @Test
     fun rejectsInvalidConfigs() {
         assertFailsWith<IllegalArgumentException> {
             GameConfig(rows = 6, columns = 7, winLength = 10)
