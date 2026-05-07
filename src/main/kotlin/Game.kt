@@ -48,3 +48,28 @@ fun GameState.dropPiece(column: Int): GameState {
      )
 }
 
+private fun isWin(board: List<List<Player?>>, column: Int, row: Int, activePlayer: Player, winLength: Int): Boolean {
+    val directions = listOf(Pair(0,1), Pair(1,0), Pair(1,-1), Pair(1, 1))
+    for ((x, y) in directions) {
+        var count = 1
+        count += countOneDirection(board, column, row, x, y, activePlayer)
+        count += countOneDirection(board, column, row, -x, -y, activePlayer)
+        if (count >= winLength) {return true}
+    }
+    return false
+
+}
+
+private fun countOneDirection(board: List<List<Player?>>, column: Int, row: Int,
+                              x : Int, y : Int, activePlayer: Player): Int {
+    var i = row + x
+    var j = column + y
+    val maxColumns = board[0].size
+    val maxRows = board.size
+    var count = 0
+    while ( i >= 0 && j >= 0 && i < maxRows && j < maxColumns && board[i][j] == activePlayer) {
+        count++
+        i++; j++
+    }
+    return count
+}
