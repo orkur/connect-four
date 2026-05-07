@@ -115,6 +115,7 @@ fun App() {
             },
             onResetGame = {
                 game = GameState(config = game.config)
+                saveGameState(game)
                 errorMessage = null
 
             },
