@@ -46,7 +46,7 @@ private fun GameControls(
             Text("Win")
             Input(InputType.Number) {
                 value(winLengthInput)
-                min("1")
+                min("4")
                 max("10")
                 onInput { onWinLengthChange(it.value.toString()) }
             }

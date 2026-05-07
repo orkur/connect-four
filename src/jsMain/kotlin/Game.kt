@@ -17,11 +17,9 @@ data class GameConfig (
     val winLength: Int = 4
 ){
     init {
-        require(rows > 0) { "Rows must be > 0" }
-        require(rows <= 20) { "Rows must be <= 20" }
-        require(columns > 0) { "Columns must be > 0" }
-        require(columns <= 20) { "Columns must be <= 20" }
-        require(winLength > 0) { "Win length must be > 0" }
+        require(rows in 1..20) { "Rows must be between 1 and 20" }
+        require(columns in 1..20) { "Columns must be between 1 and 20" }
+        require(winLength in 4..10) { "Win length must be between 4 and 10" }
         require(winLength <= maxOf(rows, columns)) { "Win length must be <= maxOf(rows, columns)" }
         require(winLength <= 10) { "Win length must be <= maxOf(rows, columns)" }
     }

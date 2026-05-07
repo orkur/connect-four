@@ -62,13 +62,15 @@ class GameTest {
 
     @Test
     fun detectDraw() {
-        var game = GameState(config = GameConfig(2, 3, 3))
+        var game = GameState(config = GameConfig(2, 4, 4))
         game = game.dropPiece(0)
         game = game.dropPiece(1)
         game = game.dropPiece(2)
         game = game.dropPiece(0)
         game = game.dropPiece(1)
         game = game.dropPiece(2)
+        game = game.dropPiece(3)
+        game = game.dropPiece(3)
 
         assertEquals(GameStatus.Draw, game.gameStatus)
         val gameAfterExtraMove = game.dropPiece(1)
@@ -82,16 +84,16 @@ class GameTest {
             GameConfig(rows = 6, columns = 7, winLength = 10)
         }
         assertFailsWith<IllegalArgumentException> {
-            GameConfig(rows = 0, columns = 7, winLength = 1)
+            GameConfig(rows = 0, columns = 7, winLength = 4)
         }
         assertFailsWith<IllegalArgumentException> {
-            GameConfig(rows = 6, columns = 0, winLength = 1)
+            GameConfig(rows = 6, columns = 0, winLength = 4)
         }
         assertFailsWith<IllegalArgumentException> {
-            GameConfig(rows = 21, columns = 7, winLength = 1)
+            GameConfig(rows = 21, columns = 7, winLength = 4)
         }
         assertFailsWith<IllegalArgumentException> {
-            GameConfig(rows = 6, columns = 21, winLength = 1)
+            GameConfig(rows = 6, columns = 21, winLength = 4)
         }
     }
 }
