@@ -19,32 +19,52 @@ data class GameConfig (
         require(winLength <= maxOf(rows, columns)) { "Win length must be <= maxOf(rows, columns)" }
     }
 }
+enum class GameStatus {
+    InProgress,
+    YellowWin,
+    RedWin,
+    Draw;
 
+    companion object {
+        fun setWinner(player: Player): GameStatus =
+            if (player == Player.Red) RedWin else YellowWin
+    }
+}
 
 data class GameState(
     val config: GameConfig = GameConfig(),
     val board: List<List<Player?>> = List(config.rows) { List(config.columns) { null } },
-    val currentPlayer: Player = Player.Red
+    val activePlayer: Player = Player.Red,
+    val gameStatus: GameStatus = GameStatus.InProgress,
+    val freeSpaces: Int = config.rows * config.columns
 )
 
 fun GameState.dropPiece(column: Int): GameState {
-    if (column < 0 || column >= board.size) error("Column must be in [0, ${board.size-1}]")
+    if (column < 0 || column >= config.columns) error("Column must be in [0, ${board.size-1}]")
 
     val rowNumber = (config.rows - 1 downTo 0).firstOrNull { row -> board[row][column] == null } ?: error("full row")
 
     val newBoard = board.mapIndexed { i, row ->
         if (i == rowNumber)
             row.mapIndexed { j, cell ->
-                if (j == column) currentPlayer else cell
+                if (j == column) activePlayer else cell
             }
         else
             row
     }
-    //place for winning condition
+    val newFreeSpaces = freeSpaces - 1
+    var newGameStatus : GameStatus = GameStatus.InProgress
+    if (isWin(newBoard, column, rowNumber, activePlayer, config.winLength)) {
+        newGameStatus = GameStatus.setWinner(activePlayer)
+    } else if (newFreeSpaces == 0){
+        newGameStatus = GameStatus.Draw
+    }
 
      return copy(
          board = newBoard,
-         currentPlayer = currentPlayer.next()
+         activePlayer = if (newGameStatus == GameStatus.InProgress) activePlayer.next() else activePlayer,
+         gameStatus = newGameStatus,
+         freeSpaces = newFreeSpaces
      )
 }
 
@@ -69,7 +89,7 @@ private fun countOneDirection(board: List<List<Player?>>, column: Int, row: Int,
     var count = 0
     while ( i >= 0 && j >= 0 && i < maxRows && j < maxColumns && board[i][j] == activePlayer) {
         count++
-        i++; j++
+        i += x; j += y
     }
     return count
 }
