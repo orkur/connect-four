@@ -26,7 +26,7 @@ private fun GameControls(
             Text("Rows")
             Input(InputType.Number) {
                 value(rowsInput)
-                min("0")
+                min("1")
                 max("20")
                 onInput { onRowsChange(it.value.toString()) }
             }
@@ -36,7 +36,7 @@ private fun GameControls(
             Text("Columns")
             Input(InputType.Number) {
                 value(columnsInput)
-                min("0")
+                min("1")
                 max("20")
                 onInput { onColumnsChange(it.value.toString()) }
             }
@@ -46,8 +46,8 @@ private fun GameControls(
             Text("Win")
             Input(InputType.Number) {
                 value(winLengthInput)
-                min("0")
-                max("20")
+                min("1")
+                max("10")
                 onInput { onWinLengthChange(it.value.toString()) }
             }
         }
@@ -154,7 +154,7 @@ private fun Board(
     game: GameState,
     onColumnClick: (Int) -> Unit
 ) {
-    val boardMaxWidth = game.config.columns * 60
+    val boardMaxWidth = game.config.columns * 72
     val gapSize = when {
         game.config.columns >= 15 -> 3
         game.config.columns >= 10 -> 4
@@ -165,22 +165,58 @@ private fun Board(
         style {
             property("grid-template-columns", "repeat(${game.config.columns}, 1fr)")
             property("width", "min(96vw, ${boardMaxWidth}px)")
-            gap(gapSize.px)
         }
     }) {
-        game.board.forEach { row ->
-            row.forEachIndexed { columnIndex, cell ->
-                Div({
-                    classes(AppStyles.slot)
-                    onClick { if (game.gameStatus == GameStatus.InProgress) onColumnClick(columnIndex) }
-                }) {
-                    Div({ classes(
-                        when (cell) {
-                            Player.Red -> AppStyles.redPiece
-                            Player.Yellow -> AppStyles.yellowPiece
-                            null -> AppStyles.emptyPiece
+        Div({
+            classes(AppStyles.pieceLayer)
+            style {
+                property("grid-template-columns", "repeat(${game.config.columns}, 1fr)")
+                gap(gapSize.px)
+            }
+        }) {
+            game.board.forEachIndexed { rowIndex, row ->
+                row.forEachIndexed { columnIndex, cell ->
+                    val isLastMove = game.lastMove == Position(rowIndex, columnIndex)
+
+                    Div({ classes(AppStyles.pieceCell) }) {
+                        if (cell != null) {
+                            Div({ classes(
+                                    when (cell) {
+                                        Player.Red -> AppStyles.redPiece
+                                        Player.Yellow -> AppStyles.yellowPiece
+                                    }
+                                )
+                                if (isLastMove) {
+                                    val fallDistance = -(rowIndex + 1) * 115
+                                    style {
+                                        property("--fall-distance", "${fallDistance}%")
+                                        property("animation", "fall-from-top 300ms ease-in")
+                                    }
+                                }
+                            })
                         }
-                    ) })
+                    }
+                }
+            }
+        }
+        Div({
+            classes(AppStyles.boardLayer)
+            style {
+                property("grid-template-columns", "repeat(${game.config.columns}, 1fr)")
+                gap(gapSize.px)
+            }
+        }) {
+            game.board.forEach { row ->
+                row.forEachIndexed { columnIndex, _ ->
+                    Div({
+                        classes(AppStyles.slot)
+
+                        onClick {
+                            if (game.gameStatus == GameStatus.InProgress) {
+                                onColumnClick(columnIndex)
+                            }
+                        }
+                    })
                 }
             }
         }
@@ -198,33 +234,51 @@ object AppStyles : StyleSheet() {
     }
 
     val board by style {
+        property("position", "relative")
+        property("margin", "0 auto")
+    }
+
+    val pieceLayer by style {
         display(DisplayStyle.Grid)
 
-        property("margin", "0 auto")
+        property("position", "absolute")
+        property("inset", "0")
+        property("z-index", "1")
+        property("pointer-events", "none")
+
+        padding(8.px)
+        boxSizing("border-box")
+    }
+
+    val boardLayer by style {
+        display(DisplayStyle.Grid)
+
+        property("position", "relative")
+        property("z-index", "2")
 
         padding(8.px)
         borderRadius(16.px)
-        backgroundColor(rgb(66, 135, 245))
         boxSizing("border-box")
+    }
+
+    val pieceCell by style {
+        property("aspect-ratio", "1 / 1")
+
+        display(DisplayStyle.Flex)
+        alignItems(AlignItems.Center)
+        justifyContent(JustifyContent.Center)
     }
 
     val slot by style {
         property("aspect-ratio", "1 / 1")
         borderRadius(50.percent)
-        backgroundColor(rgb(7, 16, 31))
 
-        display(DisplayStyle.Flex)
-        alignItems(AlignItems.Center)
-        justifyContent(JustifyContent.Center)
+        property(
+            "background",
+            "radial-gradient(circle, transparent 50%, rgb(30, 140, 255) 51%)"
+        )
 
         property("cursor", "pointer")
-    }
-
-    val emptyPiece by style {
-        width(85.percent)
-        height(85.percent)
-        borderRadius(50.percent)
-        backgroundColor(Color.white)
     }
 
     val redPiece by style {
@@ -232,6 +286,7 @@ object AppStyles : StyleSheet() {
         height(85.percent)
         borderRadius(50.percent)
         backgroundColor(Color.red)
+        property("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)")
     }
 
     val yellowPiece by style {
@@ -239,6 +294,7 @@ object AppStyles : StyleSheet() {
         height(85.percent)
         borderRadius(50.percent)
         backgroundColor(Color.yellow)
+        property("box-shadow", "0 2px 4px rgba(0, 0, 0, 0.25)")
     }
 
     val status by style {

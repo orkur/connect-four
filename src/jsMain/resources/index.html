@@ -3,6 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Connect Four</title>
+    <style>
+        @keyframes fall-from-top {
+            from {
+                transform: translateY(var(--fall-distance, -700%));
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
 <body>
 <div id="root"></div>

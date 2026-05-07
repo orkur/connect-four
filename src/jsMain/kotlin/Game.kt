@@ -23,6 +23,7 @@ data class GameConfig (
         require(columns <= 20) { "Columns must be <= 20" }
         require(winLength > 0) { "Win length must be > 0" }
         require(winLength <= maxOf(rows, columns)) { "Win length must be <= maxOf(rows, columns)" }
+        require(winLength <= 10) { "Win length must be <= maxOf(rows, columns)" }
     }
 }
 
@@ -40,12 +41,17 @@ enum class GameStatus {
 }
 
 @Serializable
+data class Position(val row: Int, val column: Int)
+
+
+@Serializable
 data class GameState(
     val config: GameConfig = GameConfig(),
     val board: List<List<Player?>> = List(config.rows) { List(config.columns) { null } },
     val activePlayer: Player = Player.Red,
     val gameStatus: GameStatus = GameStatus.InProgress,
-    val freeSpaces: Int = config.rows * config.columns
+    val freeSpaces: Int = config.rows * config.columns,
+    val lastMove: Position? = null
 )
 
 fun GameState.dropPiece(column: Int): GameState {
@@ -75,7 +81,8 @@ fun GameState.dropPiece(column: Int): GameState {
          board = newBoard,
          activePlayer = if (newGameStatus == GameStatus.InProgress) activePlayer.next() else activePlayer,
          gameStatus = newGameStatus,
-         freeSpaces = newFreeSpaces
+         freeSpaces = newFreeSpaces,
+         lastMove = Position(rowNumber, column)
      )
 }
 
