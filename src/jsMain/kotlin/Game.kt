@@ -14,7 +14,9 @@ data class GameConfig (
 ){
     init {
         require(rows > 0) { "Rows must be > 0" }
+        require(rows <= 20) { "Rows must be <= 20" }
         require(columns > 0) { "Columns must be > 0" }
+        require(columns <= 20) { "Columns must be <= 20" }
         require(winLength > 0) { "Win length must be > 0" }
         require(winLength <= maxOf(rows, columns)) { "Win length must be <= maxOf(rows, columns)" }
     }
@@ -42,7 +44,9 @@ data class GameState(
 fun GameState.dropPiece(column: Int): GameState {
     if (column < 0 || column >= config.columns) error("Column must be in [0, ${board.size-1}]")
 
-    val rowNumber = (config.rows - 1 downTo 0).firstOrNull { row -> board[row][column] == null } ?: error("full row")
+    if (gameStatus == GameStatus.Draw) return this
+
+    val rowNumber = (config.rows - 1 downTo 0).firstOrNull { row -> board[row][column] == null } ?: return this
 
     val newBoard = board.mapIndexed { i, row ->
         if (i == rowNumber)
